@@ -1,0 +1,30 @@
+## 绝大部分web程序不会选择下面的HTTP基本认证这种认证方式，安全性差，无法携带cookie，灵活性不足
+## 通常选择表单认证，自己实现表单登录页和验证逻辑，提高安全性
+## 基本认证无需配置EnableWebSecurity
+spring:
+  security:
+    user:
+      name: admin
+      password: 123456
+  freemarker:
+    charset: utf-8
+    suffix: .ftl
+    cache: false
+    content-type: text/html
+    check-template-location: true
+    expose-spring-macro-helpers: true
+    prefer-file-system-access: false
+    template-loader-path: classpath:/templates/
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/security?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 123
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.jerrysong.security.domain
+
