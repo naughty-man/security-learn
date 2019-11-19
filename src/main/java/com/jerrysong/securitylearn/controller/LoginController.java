@@ -1,4 +1,4 @@
-package com.jerrysong.securitylearn.config;
+package com.jerrysong.securitylearn.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
