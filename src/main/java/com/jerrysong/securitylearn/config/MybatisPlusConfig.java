@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"com.jerrysong.security.mapper"})
+@MapperScan(basePackages = {"com.jerrysong.securitylearn.mapper"})
 public class MybatisPlusConfig {
 
     @Bean

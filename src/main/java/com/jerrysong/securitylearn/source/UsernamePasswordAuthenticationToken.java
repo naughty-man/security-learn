@@ -16,6 +16,11 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
     private final Object principal;
     private Object credentials;
 
+
+    //获取主体携带的详细信息，来自于父类的属性
+    private Object details;
+
+
     // ~ Constructors
     // ===================================================================================================
 

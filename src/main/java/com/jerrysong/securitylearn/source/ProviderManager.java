@@ -6,8 +6,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.SpringSecurityMessageSource;
@@ -27,16 +28,16 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
     // ================================================================================================
 
 //    private AuthenticationEventPublisher eventPublisher = new org.springframework.security.authentication.ProviderManager.NullEventPublisher();
-    private List<org.springframework.security.authentication.AuthenticationProvider> providers = Collections.emptyList();
+    private List<AuthenticationProvider> providers = Collections.emptyList();
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
     private AuthenticationManager parent;
     private boolean eraseCredentialsAfterAuthentication = true;
 
-    public ProviderManager(List<org.springframework.security.authentication.AuthenticationProvider> providers) {
+    public ProviderManager(List<AuthenticationProvider> providers) {
         this(providers, null);
     }
 
-    public ProviderManager(List<org.springframework.security.authentication.AuthenticationProvider> providers,
+    public ProviderManager(List<AuthenticationProvider> providers,
                            AuthenticationManager parent) {
         Assert.notNull(providers, "providers list cannot be null");
         this.providers = providers;
@@ -62,7 +63,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
     /**
      * Attempts to authenticate the passed {@link Authentication} object.
      * <p>
-     * The list of {@link org.springframework.security.authentication.AuthenticationProvider}s will be successively tried until an
+     * The list of {@link AuthenticationProvider}s will be successively tried until an
      * <code>AuthenticationProvider</code> indicates it is capable of authenticating the
      * type of <code>Authentication</code> object passed. Authentication will then be
      * attempted with that <code>AuthenticationProvider</code>.
@@ -94,7 +95,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
         boolean debug = logger.isDebugEnabled();
 
         //迭代验证每个provider，直到有一个匹配退出
-        for (org.springframework.security.authentication.AuthenticationProvider provider : getProviders()) {
+        for (AuthenticationProvider provider : getProviders()) {
             if (!provider.supports(toTest)) {
                 continue;
             }

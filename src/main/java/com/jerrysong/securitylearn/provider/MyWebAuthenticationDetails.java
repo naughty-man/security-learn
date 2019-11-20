@@ -20,9 +20,9 @@ public class MyWebAuthenticationDetails extends WebAuthenticationDetails {
         String requestCode=request.getParameter("kaptcha");
         HttpSession session=request.getSession();
         String savedCode=(String) session.getAttribute("kaptcha");
+        //随手清除验证码，无论是失败还是成功，客户端应在登录失败时刷新验证码
+        session.removeAttribute("kaptcha");
         if(savedCode!=null&& !"".equals(savedCode)){
-            //随手清除验证码，无论是失败还是成功，客户端应在登录失败时刷新验证码
-            session.removeAttribute("kaptcha");
             if(Objects.equals(requestCode,savedCode)){
                 this.verifyCodeCorrect=true;
             }

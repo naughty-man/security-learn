@@ -33,3 +33,13 @@ CREATE TABLE `users` (
 -- ----------------------------
 INSERT INTO `users` VALUES ('1', 'admin', '123', '1', 'ROLE_ADMIN,ROLE_USER');
 INSERT INTO `users` VALUES ('2', 'user', '123', '1', 'ROLE_USER');
+
+
+DROP TABLE IF EXISTS `persistent_logins`;
+CREATE TABLE `persistent_logins` (
+  `username` varchar(64) DEFAULT NULL,
+  `series` varchar(64) NOT NULL,
+  `token` varchar(64) DEFAULT NULL,
+  `last_used` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`series`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
