@@ -32,6 +32,7 @@
                             <label>记住我</label>
                             <input name="remember-me" type="checkbox" value="true" />
                         </div>
+                        <input type="hidden" name="_csrf">
                         <input class="lowin-btn login-btn" type="submit">
                     </form>
                 </div>
@@ -39,5 +40,19 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    // var _csrf = ;
+    $(function () {
+        var aCookie = document.cookie.split("; ");
+        console.log(aCookie);
+        for (var i=0; i < aCookie.length; i++)
+        {
+            var aCrumb = aCookie[i].split("=");
+            if ("XSRF-TOKEN" == aCrumb[0])
+                $("input[name='_csrf']").val(aCrumb[1]);
+        }
+    });
+</script>
 </body>
 </html>

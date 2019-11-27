@@ -11,12 +11,20 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import java.util.Arrays;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -49,8 +57,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JdbcTokenRepositoryImpl jdbcTokenRepository;
 
+    @Autowired
+    private FindByIndexNameSessionRepository sessionRepository;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        SpringSessionBackedSessionRegistry sessionRegistry =new SpringSessionBackedSessionRegistry(sessionRepository);
         http
                 .authorizeRequests()
                 .antMatchers("/admin/api/**").hasRole("ADMIN")
@@ -66,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .csrf().disable()
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
                 .formLogin()
                     .authenticationDetailsSource(myWebAuthenticationDetailsSource)
                     .loginPage("/myLogin.html")
@@ -80,7 +92,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .tokenRepository(jdbcTokenRepository)
                 .and()
                     .sessionManagement()
-                .maximumSessions(1);
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry);
         http
                 .logout()
                     .logoutUrl("/myLogout")
@@ -98,4 +111,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //注销成功，删除指定cookie
                 .deleteCookies("cookie1","cookie2");
     }
+
+    /**
+     * 在声明一个passwordEncoder的bean之后，springSecurity会自动应用
+     *
+     * 下面的算法盐随机产生，不再保存数据库
+     *
+     * @return
+     */
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration corsConfiguration=new CorsConfiguration();
+        //允许跨域访问本服务的站点,add为添加一个,set为添加多个
+        corsConfiguration.addAllowedOrigin("*");
+        //下面的配置仅在OPTIONS预检请求的响应值指定有效，用于表明浏览器允许跨域的HTTP方法
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST"));
+        //当下面字段设置为true时,浏览器会在接下来的真实请求中携带用户的cookie信息，服务器也可以使用set-coolie向用户写入新cookie
+        //使用true时候,allowRrigin不可设置为*
+        corsConfiguration.setAllowCredentials(false);
+
+        //对所有URL生效
+        UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
+        configurationSource.registerCorsConfiguration("/**",corsConfiguration);
+        return configurationSource;
+    }
+
 }
